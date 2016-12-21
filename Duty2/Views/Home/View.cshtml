@@ -1,0 +1,342 @@
+﻿@inherits System.Web.Mvc.WebViewPage
+
+@using System.Web.Optimization
+<html>
+<head>
+    <title>Duty</title>
+
+    @Styles.Render("~/Content/bootstrap.css")
+    @Styles.Render("~/Content/multiple-select.css")
+    @Styles.Render("~/Content/duty.css")
+
+    @Scripts.Render("~/Scripts/jquery.min.js")
+    @Scripts.Render("~/Scripts/multiple-select.js")
+
+
+</head>
+<body>
+    <nav class="menu" align=center>
+
+        <a id="firstLineButton">Первая линия</a>
+        <a id="internalSupportButton">Внутреннее ПО</a>
+        <a id="externalSupportButton">Конечные продукты</a>
+        <a id="sysAdminButton">Системное администрирование</a>
+
+    </nav>
+
+
+    <br>
+    <table id="dutyTable" class="dutyTable" borderthickness="1" border="1" align="center"></table>
+    <br>
+    <nav class="monthSelector">
+        <ul>
+            <li><a id="monthMinus">←</a></li>
+            <li><a id="currentMonth"></a></li>
+            <li><a id="monthPlus">→</a></li>
+        </ul>
+    </nav>
+    <br>
+    <script>
+            "use strict";
+
+            document.getElementById("firstLineButton").addEventListener("click", function() {
+                configAndCreatePage("firstLine", new Date().getMonth()+1, new Date().getFullYear());
+            });
+
+            document.getElementById("internalSupportButton").addEventListener("click", function() {
+                configAndCreatePage("internalSupport", new Date().getMonth()+1, new Date().getFullYear());
+            });
+
+            document.getElementById("externalSupportButton").addEventListener("click", function() {
+                configAndCreatePage("externalSupport", new Date().getMonth()+1, new Date().getFullYear());
+            });
+
+            document.getElementById("sysAdminButton").addEventListener("click", function() {
+                configAndCreatePage("sysAdmin", new Date().getMonth()+1, new Date().getFullYear());
+            });
+            let currentGroup;
+            let currentMonth;
+            let currentYear;
+
+            let specifiedElement;
+            let isDataReadyForCreateTable;
+
+            let cellSelector;
+            let dayParts;
+            let duties;
+
+            let monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            let weelDaysNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+
+            document.addEventListener('click', function(event) {
+                if (specifiedElement == null )
+                    return;
+                var isClickInside = specifiedElement.contains(event.target);
+                if (!isClickInside) {
+                    disableSelection(document.getElementById("select"));
+                    specifiedElement = null ;
+                }
+            });
+
+            configAndCreatePage("firstLine", new Date().getMonth()+1, new Date().getFullYear());
+
+            document.getElementById("monthMinus").addEventListener("click", function() {
+                if(currentMonth-1 == 0){
+                    currentMonth = 12;
+                    currentYear--;
+                }
+                else{
+                    currentMonth--;
+                }
+                configAndCreatePage(currentGroup, currentMonth, currentYear);
+                window.scrollTo(0,document.body.scrollHeight);
+            });
+
+            document.getElementById("monthPlus").addEventListener("click", function() {
+                if(currentMonth+1 == 13){
+                    currentMonth = 1;
+                    currentYear++;
+                }
+                else{
+                    currentMonth++;
+                }
+                configAndCreatePage(currentGroup, currentMonth, currentYear);
+            });
+
+            function configAndCreatePage(group, month, year)
+            {
+                currentGroup = group;
+                currentMonth = month;
+                currentYear = year;
+                specifiedElement = null;
+                isDataReadyForCreateTable = 0;
+
+                getСellSelector();
+                getDayParts();
+                getDuties();
+
+                document.getElementById("currentMonth").textContent =  monthNames[currentMonth-1] + ' ' +  currentYear;
+            }
+
+            function getСellSelector()
+            {
+                let result;
+                let xhr = new XMLHttpRequest();
+                    xhr.open('GET', 'http://localhost:58663/api/User/?group=' + currentGroup, true);
+                    xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+                    xhr.useDefaultHeader = false;
+                    xhr.send();
+                    xhr.onload = function() {
+                        cellSelector = JSON.parse(this.response).Responce;
+                        cellSelector.forEach(function(item, i, arr) {
+                            item.isSelected = false;
+                        });
+                        isDataReadyForCreateTable++;
+                        tryCeateDutyTable(currentGroup, currentMonth, currentYear);
+                    };
+            }
+
+            function getDayParts() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', 'http://localhost:58663/api/PartOfDay/?group=' + currentGroup, true);
+                xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+                xhr.useDefaultHeader = false;
+                xhr.send();
+                xhr.onload = function() {
+                    dayParts = JSON.parse(this.response);
+                    isDataReadyForCreateTable++;
+                    tryCeateDutyTable(currentGroup, currentMonth, currentYear);
+                };
+            }
+
+            function getDuties() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', 'http://localhost:58663/api/Duty/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
+                xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+                xhr.useDefaultHeader = false;
+                xhr.send();
+                xhr.onload = function() {
+                    duties = JSON.parse(this.response);
+                    isDataReadyForCreateTable++;
+                    tryCeateDutyTable(currentGroup, currentMonth, currentYear);
+                }
+            }
+
+            function tryCeateDutyTable(){
+                if(isDataReadyForCreateTable==3){
+                    createDutyTable();
+                }
+            }
+
+
+            function transformSelectorToText(selector){
+                let text = "";
+                selector.forEach(function(item, i, arr) {
+                    if(item.isSelected == true){
+                        if(text != ""){
+                            text+=", "
+                        }
+                        text += item.Name;
+                    }
+                });
+                return  text;
+            }
+
+            function transformSelectorToMultiselect(selector){
+                let text = "<select id='select' multiple>";
+                selector.forEach(function(item, i, arr) {
+
+                    if(item.isSelected == true){
+                        text +="<option selected>";
+                    }
+                    else{
+                        text += "<option>";
+                    }
+                    text += item.Name;
+                    text += "</option>";
+                });
+                return  text;
+            }
+
+            function getSelectValues(select, cell) {
+                let result = [];
+                let options = select && select.options;
+                for (let i = 0, iLen = options.length; i < iLen; i++) {
+                    let User = cell.cellSelector.find(function(element, index, array){
+                        if (element.Name == options[i].text)
+                        return true;
+                        });
+
+                    if (options[i].selected) {
+                        User.isSelected = true;
+                    }
+                    else{
+                        User.isSelected = false;
+                    }
+                }
+            }
+
+
+            function daysInMonth(month, year) {
+                return new Date(year,month,0).getDate();
+            }
+            function FindTableElement(rowNumber, colomnNumber) {
+                let All = document.getElementById("dutyTable").getElementsByTagName('*');
+                for (let i = 0; i < All.length; i++) {
+                    if ((All[i].getAttribute("rowNumber") == rowNumber) & (All[i].getAttribute("colomnNumber") == colomnNumber)) {
+                        return All[i];
+                    }
+                }
+            }
+            function createDutyTable() {
+                let daysCount = daysInMonth(currentMonth, currentYear);
+                let table = document.getElementById("dutyTable");
+                table.innerHTML = "";
+
+                //делаем столбцы одинаковой ширины
+                let col = document.createElement('col');
+                col.innerHTML = '<col style="width:' + 100/daysCount + '%">';
+                for (let rowNumber = 0; rowNumber <= daysCount; rowNumber++)
+                    {
+                        table.appendChild(col);
+                    }
+
+                //рисуем макет таблицы
+                for (let rowNumber = 0; rowNumber <= daysCount; rowNumber++) {
+                    let row = table.insertRow(rowNumber);
+                    if(rowNumber==0) row.classList.add("darkTableHead");
+                    if(rowNumber%2!=0) row.classList.add("darkTableLine");
+                    for (let colomnNumber = 0; colomnNumber <= dayParts.Responce.length; colomnNumber++) {
+                        let cell = row.insertCell(colomnNumber);
+                        cell.setAttribute("colomnNumber", colomnNumber);
+                        cell.setAttribute("rowNumber", rowNumber);
+                        cell.colomnNumber = colomnNumber;
+                        cell.rowNumber = rowNumber;
+                        let copy = Object.assign({}, cellSelector);
+                        cell.cellSelector =  JSON.parse(JSON.stringify(cellSelector));
+                        if (rowNumber != 0 & colomnNumber != 0) {
+                            cell.addEventListener('click', function(event) {
+                            enableSelection(cell);
+                        });
+                        }
+
+                        let veekDayNumber = (new Date(currentMonth + "/" + rowNumber + "/" + currentYear)).getDay();
+
+                        if(veekDayNumber==5 || veekDayNumber==6 ){
+                            cell.parentElement.classList.add("darkWeekendLine");
+                        }
+
+                        if (colomnNumber == 0 && rowNumber != 0) {
+                            cell.innerHTML = rowNumber + "." + currentMonth + "." + currentYear +
+                                " " + weelDaysNames[veekDayNumber];
+
+
+                        }
+                    }
+                }
+                processDuties(duties);
+                processDayParts(dayParts);
+            }
+
+            function processDuties(result) {
+                result.Responce.forEach(function(item, i, arr) {
+                    let element = FindTableElement(item.Day, item.PartOfDay.Id)
+                    element.cellSelector.forEach(function(user, j, arra) {
+                        if(user.Id == item.User.Id){
+                            user.isSelected = true;
+                        }
+                    });
+                    element.innerHTML = transformSelectorToText(element.cellSelector);
+                });
+            }
+
+            function processDayParts(result) {
+                result.Responce.forEach(function(item, i, arr) {
+                    let element = FindTableElement(0, item.Sortpos)
+                    element.innerHTML += item.Description;
+                });
+            }
+            function enableSelection(element) {
+                if (specifiedElement != null )  return;
+                element.innerHTML = transformSelectorToMultiselect(element.cellSelector);
+
+                //http://wenzhixin.net.cn/p/multiple-select/docs/#browser-compatibility
+                $('#select').change(function()
+                {$(this).val();}).multipleSelect({
+                    width: '100%',
+                    isOpen: true,
+                    keepOpen: true,
+                    selectAll: false
+                });
+
+                specifiedElement = element;
+                element.onclick = null ;
+            }
+
+            function disableSelection(element) {
+                let cell = element.parentElement
+                getSelectValues(element, cell);
+                cell.textContent = transformSelectorToText(cell.cellSelector);
+                cell.onclick = function() {
+                    enableSelection(cell)
+                }
+
+                let request = {
+                    Id: "Duty",
+                    Selector: cell.cellSelector,
+                    DayPart: cell.colomnNumber,
+                    Date: currentYear + "." +  currentMonth + "." + cell.rowNumber
+                }
+
+                var xhr = new XMLHttpRequest();
+
+                var json = JSON.stringify(request);
+
+                xhr.open("POST", 'http://localhost:58663/api/Duty', true)
+                xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+                xhr.send(json);
+            }
+
+    </script>
+</body>
+</html>

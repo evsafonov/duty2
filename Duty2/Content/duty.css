@@ -1,0 +1,79 @@
+.menu {
+  width: 100%;	
+  justify-content: space-between;
+  display: flex;
+}
+
+.menu nav {
+  margin: 0 auto 30px;
+  text-align: center;
+  }
+
+.menu a {
+  text-decoration: none;
+  transition: .5s linear;
+  width: 100%;
+  padding: 0.5em;
+  color: #9B4222;
+  background: rgba(255, 171, 81, .3);
+  cursor: default;
+  
+  display: inline;
+  
+}
+.menu a:hover {background: #FFAB51}
+
+.dutyTable {
+	width: 90%;
+    padding: 4px;
+    border: 1px solid #FFAB51; 
+
+}
+
+
+td {
+    padding: 6px;
+}
+
+.navigationPanel {
+    display: block
+}
+
+.darkTableLine  {
+	background-color:#F7F6F3;
+}
+
+.darkTableHead {
+	background-color:#FFAB51;
+}
+
+.darkWeekendLine{
+	background: rgba(255, 171, 81, .3);
+}
+
+td{ width: 100
+}
+
+.monthSelector nav {
+  display: block;
+  margin: 0 auto 30px;
+
+}
+
+.monthSelector ul {
+  list-style: none; 
+  display: -webkit-flex; 
+  width: 15%;
+  margin: 0 auto;
+
+}
+.monthSelector a {
+  text-decoration: none;
+  transition: .5s linear;
+  padding: 0.5em;
+  display: block;
+  color: #9B4222;
+  background: rgba(255, 171, 81, .3);
+  cursor: default;
+}
+.monthSelector a:hover {background: #FFAB51}
