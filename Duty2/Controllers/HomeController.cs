@@ -6,7 +6,6 @@ using System.Web.Mvc;
 
 namespace Duty2.Controllers
 {
-   // [Authorize]
     public class HomeController : Controller
     {
         // GET: Home

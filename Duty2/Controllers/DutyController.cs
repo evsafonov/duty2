@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.Description;
@@ -15,7 +16,6 @@ namespace Duty2.Controllers
 {
     public class DutyController : ApiController
     {
-        [EnableCors(origins: "*", headers: "*", methods: "*")]
         public async Task<Resp> Get(string group, int month, int year)
         {
             var db = new DataContext();
@@ -40,8 +40,8 @@ namespace Duty2.Controllers
             };
         }
 
+
         [Authorize]
-        [EnableCors(origins: "*", headers: "*", methods: "*")]
         [ResponseType(typeof (OkResult))]
         public async Task<IHttpActionResult> Post(SelectorContainer selectorContainer)
         {

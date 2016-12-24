@@ -51,9 +51,6 @@ td {
 	background: rgba(255, 171, 81, .3);
 }
 
-td{ width: 100
-}
-
 .monthSelector nav {
   display: block;
   margin: 0 auto 30px;
@@ -63,7 +60,6 @@ td{ width: 100
 .monthSelector ul {
   list-style: none; 
   display: -webkit-flex; 
-  width: 15%;
   margin: 0 auto;
 
 }

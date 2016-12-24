@@ -9,7 +9,6 @@ namespace Duty2.Controllers
 {
     public class PartOfDayController : ApiController
     {
-        [EnableCors(origins: "*", headers: "*", methods: "*")]
         public Resp Get(string group)
         {
             var db = new DataContext();

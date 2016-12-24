@@ -1,5 +1,6 @@
 ﻿@inherits System.Web.Mvc.WebViewPage
 
+@using System.Web.Mvc.Html
 @using System.Web.Optimization
 <html>
 <head>
@@ -21,9 +22,9 @@
         <a id="internalSupportButton">Внутреннее ПО</a>
         <a id="externalSupportButton">Конечные продукты</a>
         <a id="sysAdminButton">Системное администрирование</a>
-
+        
     </nav>
-
+    @Html.Partial("LoginPartial")
 
     <br>
     <table id="dutyTable" class="dutyTable" borderthickness="1" border="1" align="center"></table>
@@ -58,6 +59,8 @@
             let currentMonth;
             let currentYear;
 
+            let isUserAusorized;
+
             let specifiedElement;
             let isDataReadyForCreateTable;
 
@@ -77,8 +80,6 @@
                     specifiedElement = null ;
                 }
             });
-
-            configAndCreatePage("firstLine", new Date().getMonth()+1, new Date().getFullYear());
 
             document.getElementById("monthMinus").addEventListener("click", function() {
                 if(currentMonth-1 == 0){
@@ -103,6 +104,21 @@
                 configAndCreatePage(currentGroup, currentMonth, currentYear);
             });
 
+            checkAuthorization();
+
+            function checkAuthorization() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', 'https://localhost:44344/api/Auth', true);
+                xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+                xhr.useDefaultHeader = false;
+                xhr.send();
+                xhr.onload = function () {
+                    isUserAusorized = JSON.parse(this.response).Responce;
+                    configAndCreatePage("firstLine", new Date().getMonth() + 1, new Date().getFullYear());
+
+                };
+            }
+
             function configAndCreatePage(group, month, year)
             {
                 currentGroup = group;
@@ -120,9 +136,8 @@
 
             function getСellSelector()
             {
-                let result;
                 let xhr = new XMLHttpRequest();
-                    xhr.open('GET', 'http://localhost:58663/api/User/?group=' + currentGroup, true);
+                xhr.open('GET', 'https://localhost:44344/api/User/?group=' + currentGroup, true);
                     xhr.setRequestHeader('Content-Type', 'applicat ion/json');
                     xhr.useDefaultHeader = false;
                     xhr.send();
@@ -138,7 +153,7 @@
 
             function getDayParts() {
                 let xhr = new XMLHttpRequest();
-                xhr.open('GET', 'http://localhost:58663/api/PartOfDay/?group=' + currentGroup, true);
+                xhr.open('GET', 'https://localhost:44344/api/PartOfDay/?group=' + currentGroup, true);
                 xhr.setRequestHeader('Content-Type', 'applicat ion/json');
                 xhr.useDefaultHeader = false;
                 xhr.send();
@@ -151,7 +166,7 @@
 
             function getDuties() {
                 let xhr = new XMLHttpRequest();
-                xhr.open('GET', 'http://localhost:58663/api/Duty/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
+                xhr.open('GET', 'https://localhost:44344/api/Duty/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
                 xhr.setRequestHeader('Content-Type', 'applicat ion/json');
                 xhr.useDefaultHeader = false;
                 xhr.send();
@@ -252,9 +267,8 @@
                         cell.setAttribute("rowNumber", rowNumber);
                         cell.colomnNumber = colomnNumber;
                         cell.rowNumber = rowNumber;
-                        let copy = Object.assign({}, cellSelector);
                         cell.cellSelector =  JSON.parse(JSON.stringify(cellSelector));
-                        if (rowNumber != 0 & colomnNumber != 0) {
+                        if (rowNumber != 0 & colomnNumber != 0 & isUserAusorized == true) {
                             cell.addEventListener('click', function(event) {
                             enableSelection(cell);
                         });
@@ -269,8 +283,6 @@
                         if (colomnNumber == 0 && rowNumber != 0) {
                             cell.innerHTML = rowNumber + "." + currentMonth + "." + currentYear +
                                 " " + weelDaysNames[veekDayNumber];
-
-
                         }
                     }
                 }
@@ -332,7 +344,7 @@
 
                 var json = JSON.stringify(request);
 
-                xhr.open("POST", 'http://localhost:58663/api/Duty', true)
+                xhr.open("POST", 'https://localhost:44344/api/Duty', true);
                 xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
                 xhr.send(json);
             }
