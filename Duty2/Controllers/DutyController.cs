@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
-using System.Web.Http.Cors;
-using System.Web.Http.Description;
-using System.Web.Http.Results;
+using Duty2.Helpers;
 using Duty2.Models;
 using Duty2.ViewModels;
 using Duty = Duty2.Models.Duty;
@@ -40,10 +35,9 @@ namespace Duty2.Controllers
             };
         }
 
-
         [Authorize]
-        [ResponseType(typeof (OkResult))]
-        public async Task<IHttpActionResult> Post(SelectorContainer selectorContainer)
+        [ClausAuth]
+        public async Task<IHttpActionResult> Post(SelectorContainer selectorContainer, string group)
         {
             var db = new DataContext();
 
@@ -52,13 +46,12 @@ namespace Duty2.Controllers
                 return BadRequest(ModelState);
             }
 
-
             foreach (var item in selectorContainer.Selector)
             {
                 var dutysInDB = await db.Duties.Where(
                     d =>
                         d.User.Id == item.Id && d.Date == selectorContainer.Date && d.PartOfDay.Sortpos == selectorContainer.DayPart &&
-                        d.User.Group.Id == 1).ToListAsync();
+                        d.User.Group.Description == group).ToListAsync();
 
                 if (!dutysInDB.Any() && item.isSelected)
                 {
@@ -80,7 +73,6 @@ namespace Duty2.Controllers
             }
 
             await db.SaveChangesAsync();
-
             return Ok();
         }
     }

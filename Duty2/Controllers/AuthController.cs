@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using System.Security.Claims;
 using System.Web;
 using System.Web.Http;
-using System.Web.Http.Cors;
-using Duty2.Models;
 using Duty2.ViewModels;
 
 namespace Duty2.Controllers
@@ -12,13 +10,18 @@ namespace Duty2.Controllers
     {
         public Resp Get()
         {
-            var httpContextWrapper = Request.Properties["MS_HttpContext"] as HttpContextWrapper;
-            var isAusorized = httpContextWrapper != null && httpContextWrapper.User.Identity.IsAuthenticated;
+            string userGroup = null;
+            var claimsIdentity = ((HttpContextWrapper)Request.Properties["MS_HttpContext"]).User.Identity as ClaimsIdentity;
+            var userGroupClaim = claimsIdentity?.Claims.FirstOrDefault(c => c.Type == "http://2gis.local/Duty/DutyGroups");
+            if (userGroupClaim != null)
+            {
+                userGroup = userGroupClaim.Value;
+            }
 
             return new Resp()
             {
                 Id = "IsUserAuthorized",
-                Responce = isAusorized
+                Responce = userGroup
             };
         }
     }

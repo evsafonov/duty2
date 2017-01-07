@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
 namespace Duty2.Controllers
 {
@@ -11,8 +7,6 @@ namespace Duty2.Controllers
         // GET: Home
         public ActionResult Index()
         {
-            var user = HttpContext.User;
-
             return View("View");
         }
     }

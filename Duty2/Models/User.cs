@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public bool Isadmin { get; set; }
         public string Name { get; set; }
+        public string Email { get; set; }
         public Group Group { get; set; }
     }
 }

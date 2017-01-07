@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using System.Web.Http.Cors;
 using Duty2.Models;
 using Duty2.ViewModels;
-using User = Duty2.ViewModels.User;
 
 namespace Duty2.Controllers
 {

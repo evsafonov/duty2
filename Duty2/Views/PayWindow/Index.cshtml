@@ -1,0 +1,70 @@
+﻿@inherits System.Web.Mvc.WebViewPage
+
+@using System.Web.Mvc.Html
+@using System.Web.Optimization
+<html>
+<head>
+    <title>Payments</title>
+
+    @Styles.Render("~/Content/bootstrap.css")
+    @Styles.Render("~/Content/multiple-select.css")
+    @Styles.Render("~/Content/duty.css")
+
+    @Scripts.Render("~/Scripts/jquery.min.js")
+    @Scripts.Render("~/Scripts/multiple-select.js")
+</head>
+<body>
+<table id="paymentTable" class="paymentTable" borderthickness="1" border="1" align="center"></table>
+
+
+<script>
+    let paymentData;
+
+    function createPaymentTable() {
+        let peopleCount = paymentData.length;
+        let table = document.getElementById("paymentTable");
+        table.innerHTML = "";
+
+        //делаем столбцы одинаковой ширины
+        for (let rowNumber = 0; rowNumber <= 2; rowNumber++) {
+            let col = document.createElement('col');
+            col.style = 'width:50%';
+            table.appendChild(col);
+        }
+
+        //рисуем макет таблицы
+        for (let rowNumber = 0; rowNumber <= peopleCount; rowNumber++) {
+            let row = table.insertRow(rowNumber);
+            if (rowNumber == 0) {
+                row.classList.add("darkTableHead");
+                continue;
+                //добавить заголовки
+            }
+            if (rowNumber % 2 != 0) row.classList.add("darkTableLine");
+
+            for (let colomnNumber = 0; colomnNumber < 2; colomnNumber++) {
+                let cell = row.insertCell(colomnNumber);
+                if (colomnNumber == 0) {
+                    cell.innerText = paymentData[rowNumber - 1].user.Name;
+                } else {
+                    cell.innerText = paymentData[rowNumber - 1].Count;
+                }
+                
+            }
+        }
+    }
+
+    function getAndRefreshPaymentsData(currentGroup, currentMonth, currentYear) {
+        let xhr = new XMLHttpRequest();
+        xhr.open('get', 'https://localhost:44344/api/Payment/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
+        xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+        xhr.useDefaultHeader = false;
+        xhr.send();
+        xhr.onload = function () {
+            paymentData = JSON.parse(this.response).Responce;
+            createPaymentTable();
+        };
+    }
+</script>
+</body>
+</html>

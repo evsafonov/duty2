@@ -192,15 +192,23 @@
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\DutyController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\PartOfDayController.cs" />
+    <Compile Include="Controllers\PaymentController.cs" />
+    <Compile Include="Controllers\PayWindowController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ClausAuth.cs" />
     <Compile Include="Helpers\EmailSender.cs" />
     <Compile Include="Migrations\201611161544091_InitialCreate.cs" />
     <Compile Include="Migrations\201611161544091_InitialCreate.Designer.cs">
       <DependentUpon>201611161544091_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612241429333_addEmail.cs" />
+    <Compile Include="Migrations\201612241429333_addEmail.Designer.cs">
+      <DependentUpon>201612241429333_addEmail.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\DataContext.cs" />
@@ -221,6 +229,7 @@
     <Compile Include="App_Start\Srartup.Auth.cs" />
     <None Include="Views\Home\LoginPartial.cshtml" />
     <Content Include="Views\Web.config" />
+    <Content Include="Views\PayWindow\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -234,6 +243,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201611161544091_InitialCreate.resx">
       <DependentUpon>201611161544091_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612241429333_addEmail.resx">
+      <DependentUpon>201612241429333_addEmail.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

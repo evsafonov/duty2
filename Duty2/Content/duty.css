@@ -60,8 +60,8 @@ td {
 .monthSelector ul {
   list-style: none; 
   display: -webkit-flex; 
+  width: 15%;
   margin: 0 auto;
-
 }
 .monthSelector a {
   text-decoration: none;

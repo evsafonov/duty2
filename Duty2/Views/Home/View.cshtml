@@ -12,8 +12,6 @@
 
     @Scripts.Render("~/Scripts/jquery.min.js")
     @Scripts.Render("~/Scripts/multiple-select.js")
-
-
 </head>
 <body>
     <nav class="menu" align=center>
@@ -25,7 +23,8 @@
         
     </nav>
     @Html.Partial("LoginPartial")
-
+    <button id="sendEmailBtn">sendEmail</button>
+    <button id="paymentsCount">paymentsCount</button>
     <br>
     <table id="dutyTable" class="dutyTable" borderthickness="1" border="1" align="center"></table>
     <br>
@@ -40,7 +39,25 @@
     <script>
             "use strict";
 
-            document.getElementById("firstLineButton").addEventListener("click", function() {
+            let currentGroup;
+            let currentMonth;
+            let currentYear;
+
+            let userRigstsGroup;
+
+            let specifiedElement;
+            let isDataReadyForCreateTable;
+
+            let cellSelector;
+            let dayParts;
+            let duties;
+
+            let paymentWindow;
+
+            let monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            let weelDaysNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+
+            document.getElementById("firstLineButton").addEventListener("click", function () {
                 configAndCreatePage("firstLine", new Date().getMonth()+1, new Date().getFullYear());
             });
 
@@ -55,21 +72,14 @@
             document.getElementById("sysAdminButton").addEventListener("click", function() {
                 configAndCreatePage("sysAdmin", new Date().getMonth()+1, new Date().getFullYear());
             });
-            let currentGroup;
-            let currentMonth;
-            let currentYear;
 
-            let isUserAusorized;
+            document.getElementById("sendEmailBtn").addEventListener("click", function () {
+                sendEmailNotification();
+            });
 
-            let specifiedElement;
-            let isDataReadyForCreateTable;
-
-            let cellSelector;
-            let dayParts;
-            let duties;
-
-            let monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            let weelDaysNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+            document.getElementById("paymentsCount").addEventListener("click", function () {
+                countPayments();
+            });
 
             document.addEventListener('click', function(event) {
                 if (specifiedElement == null )
@@ -90,7 +100,7 @@
                     currentMonth--;
                 }
                 configAndCreatePage(currentGroup, currentMonth, currentYear);
-                window.scrollTo(0,document.body.scrollHeight);
+                getAndRefreshPaymentsData();
             });
 
             document.getElementById("monthPlus").addEventListener("click", function() {
@@ -102,6 +112,7 @@
                     currentMonth++;
                 }
                 configAndCreatePage(currentGroup, currentMonth, currentYear);
+                getAndRefreshPaymentsData();
             });
 
             checkAuthorization();
@@ -113,9 +124,12 @@
                 xhr.useDefaultHeader = false;
                 xhr.send();
                 xhr.onload = function () {
-                    isUserAusorized = JSON.parse(this.response).Responce;
-                    configAndCreatePage("firstLine", new Date().getMonth() + 1, new Date().getFullYear());
-
+                    userRigstsGroup = JSON.parse(this.response).Responce;
+                    if (userRigstsGroup == null) {
+                        configAndCreatePage("firstLine", new Date().getMonth() + 1, new Date().getFullYear());
+                    } else {
+                        configAndCreatePage(userRigstsGroup, new Date().getMonth() + 1, new Date().getFullYear());
+                    }
                 };
             }
 
@@ -183,13 +197,32 @@
                 }
             }
 
+            function sendEmailNotification() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://localhost:44344/api/Mail/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
+                xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+                xhr.useDefaultHeader = false;
+                xhr.send();
+                xhr.onload = function () {
+                    //написать код уведомления об успешной отправке
+                };
+            }
+
+            function countPayments() {
+                paymentWindow = window.open("@Url.Action("Index", "PayWindow")", "paymentWindow", "width=300,height=500");
+                paymentWindow.onload = function() { getAndRefreshPaymentsData()};
+            }
+
+            function getAndRefreshPaymentsData() {
+                paymentWindow.getAndRefreshPaymentsData(currentGroup, currentMonth, currentYear);
+            }
 
             function transformSelectorToText(selector){
                 let text = "";
                 selector.forEach(function(item, i, arr) {
                     if(item.isSelected == true){
-                        if(text != ""){
-                            text+=", "
+                        if(text != "") {
+                            text += ", ";
                         }
                         text += item.Name;
                     }
@@ -214,7 +247,6 @@
             }
 
             function getSelectValues(select, cell) {
-                let result = [];
                 let options = select && select.options;
                 for (let i = 0, iLen = options.length; i < iLen; i++) {
                     let User = cell.cellSelector.find(function(element, index, array){
@@ -230,8 +262,6 @@
                     }
                 }
             }
-
-
             function daysInMonth(month, year) {
                 return new Date(year,month,0).getDate();
             }
@@ -249,12 +279,14 @@
                 table.innerHTML = "";
 
                 //делаем столбцы одинаковой ширины
-                let col = document.createElement('col');
-                col.innerHTML = '<col style="width:' + 100/daysCount + '%">';
-                for (let rowNumber = 0; rowNumber <= daysCount; rowNumber++)
-                    {
-                        table.appendChild(col);
-                    }
+
+                for (let rowNumber = 0; rowNumber <= dayParts.Responce.length; rowNumber++)
+                {
+                    let col = document.createElement('col');
+                    col.style = 'width:' + (100/(dayParts.Responce.length+1)).toFixed() + '%';
+                    table.appendChild(col);
+
+                }
 
                 //рисуем макет таблицы
                 for (let rowNumber = 0; rowNumber <= daysCount; rowNumber++) {
@@ -268,7 +300,7 @@
                         cell.colomnNumber = colomnNumber;
                         cell.rowNumber = rowNumber;
                         cell.cellSelector =  JSON.parse(JSON.stringify(cellSelector));
-                        if (rowNumber != 0 & colomnNumber != 0 & isUserAusorized == true) {
+                        if (rowNumber != 0 & colomnNumber != 0 & currentGroup == userRigstsGroup) {
                             cell.addEventListener('click', function(event) {
                             enableSelection(cell);
                         });
@@ -281,7 +313,7 @@
                         }
 
                         if (colomnNumber == 0 && rowNumber != 0) {
-                            cell.innerHTML = rowNumber + "." + currentMonth + "." + currentYear +
+                            cell.innerHTML = AddZeroToNuberLessThen10(rowNumber) + "." + AddZeroToNuberLessThen10(currentMonth) + "." + currentYear +
                                 " " + weelDaysNames[veekDayNumber];
                         }
                     }
@@ -326,11 +358,11 @@
             }
 
             function disableSelection(element) {
-                let cell = element.parentElement
+                let cell = element.parentElement;
                 getSelectValues(element, cell);
                 cell.textContent = transformSelectorToText(cell.cellSelector);
                 cell.onclick = function() {
-                    enableSelection(cell)
+                    enableSelection(cell);
                 }
 
                 let request = {
@@ -344,10 +376,25 @@
 
                 var json = JSON.stringify(request);
 
-                xhr.open("POST", 'https://localhost:44344/api/Duty', true);
+                xhr.open("POST", 'https://localhost:44344/api/Duty/?group=' + currentGroup, true);
                 xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
                 xhr.send(json);
+
+                xhr.onload = function () {
+                    getAndRefreshPaymentsData();
+                };
             }
+
+            function AddZeroToNuberLessThen10(number) {
+                var result;
+                if (number < 10) {
+                    result = "0" + number.toString();
+                }
+                else {
+                    result = number.toString();
+                }
+                return result;
+            };
 
     </script>
 </body>

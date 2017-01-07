@@ -1,7 +1,5 @@
 ﻿using System.Linq;
 using System.Web.Http;
-using System.Web.Http.Cors;
-using System.Web.Mvc;
 using Duty2.Models;
 using Duty2.ViewModels;
 

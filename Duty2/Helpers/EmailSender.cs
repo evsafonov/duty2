@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Mail;
 using System.Web.UI.WebControls;
 
@@ -6,8 +7,9 @@ namespace Duty2.Helpers
 {
     public class EmailSender
     {
-        public void SendMailGlobal(string  theme, string body, string sendTo)
+        public void SendMail(string  theme, string body, string sendTo)
         {
+            if (sendTo == null) return;
 
             SmtpClient smtpClient = new SmtpClient();
             NetworkCredential basicCredential = new NetworkCredential("2gis\\duty", "123qwe!!");
@@ -22,7 +24,7 @@ namespace Duty2.Helpers
             message.Subject = "График дежурств";
 
             message.IsBodyHtml = true;
-            message.Body = body + "<br/>" + "<br/>" + " " + body;
+            message.Body = body;
 
             message.To.Add(sendTo);
 
