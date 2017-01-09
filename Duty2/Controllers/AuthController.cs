@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Web;
 using System.Web.Http;
-using Duty2.ViewModels;
+using Duty2.DTOs;
 
 namespace Duty2.Controllers
 {

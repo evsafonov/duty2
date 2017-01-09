@@ -209,7 +209,7 @@
             }
 
             function countPayments() {
-                paymentWindow = window.open("@Url.Action("Index", "PayWindow")", "paymentWindow", "width=300,height=500");
+                paymentWindow = window.open("@Url.Action("Index", "PayWindow")", "paymentWindow", "width=500,height=500");
                 paymentWindow.onload = function() { getAndRefreshPaymentsData()};
             }
 

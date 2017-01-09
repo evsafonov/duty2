@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Duty2.DTOs;
 using Duty2.Helpers;
 using Duty2.Models;
-using Duty2.ViewModels;
 using Duty = Duty2.Models.Duty;
 
 namespace Duty2.Controllers
@@ -20,7 +20,7 @@ namespace Duty2.Controllers
                     .Include(d => d.User.Group)
                     .Where(d => d.User.Group.Description == group && d.Date.Month == month && d.Date.Year == year).ToListAsync();
 
-            var result = duties.Select(duty => new ViewModels.Duty()
+            var result = duties.Select(duty => new DTOs.Duty()
             {
                 Day = duty.Date.Day,
                 PartOfDay = duty.PartOfDay,

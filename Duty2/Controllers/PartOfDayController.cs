@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Web.Http;
+using Duty2.DTOs;
 using Duty2.Models;
-using Duty2.ViewModels;
 
 namespace Duty2.Controllers
 {

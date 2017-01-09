@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Duty2.ViewModels
+namespace Duty2.DTOs
 {
     public class SelectorContainer
     {

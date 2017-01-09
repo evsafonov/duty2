@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using System.Web.Query.Dynamic;
-using Duty2.Models;
-
-namespace Duty2.ViewModels
+﻿namespace Duty2.DTOs
 {
     public class Resp
     {

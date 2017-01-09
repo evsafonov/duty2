@@ -217,11 +217,11 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\Duty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\Duty.cs" />
-    <Compile Include="ViewModels\Resp.cs" />
-    <Compile Include="ViewModels\Selector.cs" />
-    <Compile Include="ViewModels\SelectorContainer.cs" />
-    <Compile Include="ViewModels\User.cs" />
+    <Compile Include="DTOs\Duty.cs" />
+    <Compile Include="DTOs\Resp.cs" />
+    <Compile Include="DTOs\Selector.cs" />
+    <Compile Include="DTOs\SelectorContainer.cs" />
+    <Compile Include="DTOs\User.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

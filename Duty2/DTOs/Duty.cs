@@ -1,4 +1,4 @@
-﻿namespace Duty2.ViewModels
+﻿namespace Duty2.DTOs
 {
     public class Duty
     {
