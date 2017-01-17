@@ -24,7 +24,7 @@ namespace Duty2.Controllers
             return new Resp()
             {
                 Id = "UsersForSelect",
-                Responce = result
+                Responce = result.OrderBy(u => u.Name)
             };
         }
     }
