@@ -15,9 +15,7 @@
 
 
 <script>
-    let paymentData;
-
-    function createPaymentTable() {
+    function createPaymentTable(paymentData) {
         let peopleCount = paymentData.length;
         let table = document.getElementById("paymentTable");
         table.innerHTML = "";
@@ -45,29 +43,18 @@
             for (let colomnNumber = 0; colomnNumber <= 2; colomnNumber++) {
                 let cell = row.insertCell(colomnNumber);
                 if (colomnNumber == 0) {
-                    cell.innerText = paymentData[rowNumber - 1].user.Name;
+                    cell.innerText = paymentData[rowNumber - 1].User.Name;
                 }
                 if (colomnNumber == 1) {
                     cell.innerText = paymentData[rowNumber - 1].Count;
                 }
                 if (colomnNumber == 2) {
-                    cell.innerText = paymentData[rowNumber - 1].Count*600;
+                    cell.innerText = paymentData[rowNumber - 1].Count*700;
                 }
             }
         }
     }
 
-    function getAndRefreshPaymentsData(currentGroup, currentMonth, currentYear) {
-        let xhr = new XMLHttpRequest();
-        xhr.open('get', 'https://localhost:44344/api/Payment/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
-        xhr.setRequestHeader('Content-Type', 'applicat ion/json');
-        xhr.useDefaultHeader = false;
-        xhr.send();
-        xhr.onload = function () {
-            paymentData = JSON.parse(this.response).Responce;
-            createPaymentTable();
-        };
-    }
 </script>
 </body>
 </html>

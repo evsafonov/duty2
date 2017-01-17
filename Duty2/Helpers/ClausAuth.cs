@@ -15,9 +15,9 @@ namespace Duty2.Helpers
             var userGroup = actionContext.Request.GetQueryNameValuePairs().ToDictionary(x => x.Key, x => x.Value).FirstOrDefault(g => g.Key == "group").Value;
 
             var claimsIdentity = actionContext.RequestContext.Principal.Identity as ClaimsIdentity;
-            var userGroupClaim = claimsIdentity?.Claims.FirstOrDefault(c => c.Type == "http://2gis.local/Duty/DutyGroups");
+            var userGroupClaims = claimsIdentity?.Claims.Where(c => c.Type == "http://2gis.local/Duty/DutyGroups").Select(c => c.Value).ToList();
 
-            if (userGroupClaim == null || userGroup != userGroupClaim.Value)
+            if (userGroupClaims == null || !userGroupClaims.Contains(userGroup))
             {
                 return false;
             }

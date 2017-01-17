@@ -1,270 +1,305 @@
-﻿@inherits System.Web.Mvc.WebViewPage
+﻿@inherits WebViewPage
 
 @using System.Web.Mvc.Html
-@using System.Web.Optimization
 <html>
 <head>
     <title>Duty</title>
 
+    @Styles.Render("~/Content/sweetalert.min.css")
     @Styles.Render("~/Content/bootstrap.css")
     @Styles.Render("~/Content/multiple-select.css")
     @Styles.Render("~/Content/duty.css")
 
     @Scripts.Render("~/Scripts/jquery.min.js")
+    @Scripts.Render("~/Scripts/jquery.mtz.monthpicker.js")
     @Scripts.Render("~/Scripts/multiple-select.js")
+    @Scripts.Render("~/Scripts/sweetalert.min.js")
+
+    <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js'></script>
+
 </head>
 <body>
-    <nav class="menu" align=center>
+    <div class="menu">
+        <div class="nav-menu">
+            <div class="menu-bar">
+                <a id="firstLineButton">Первая линия</a>
+                <a id="internalSupportButton">Внутреннее ПО</a>
+                <a id="externalSupportButton">Конечные продукты</a>
+                <a id="sysAdminButton">Системное администрирование</a>
+            </div>
+            <div class="nav-bar">
+                <a id="paymentsCount" title="Посчитать оплату">&#8381;</a>
+                <a id="sendEmailBtn" title="Отправить E-mail">&#9993;</a>
+                @Html.Partial("LoginPartial")
+            </div>
+        </div>
+    </div>
 
-        <a id="firstLineButton">Первая линия</a>
-        <a id="internalSupportButton">Внутреннее ПО</a>
-        <a id="externalSupportButton">Конечные продукты</a>
-        <a id="sysAdminButton">Системное администрирование</a>
-        
-    </nav>
-    @Html.Partial("LoginPartial")
-    <button id="sendEmailBtn">sendEmail</button>
-    <button id="paymentsCount">paymentsCount</button>
+<div id="loader" class="loader"></div>
     <br>
     <table id="dutyTable" class="dutyTable" borderthickness="1" border="1" align="center"></table>
     <br>
-    <nav class="monthSelector">
-        <ul>
-            <li><a id="monthMinus">←</a></li>
-            <li><a id="currentMonth"></a></li>
-            <li><a id="monthPlus">→</a></li>
-        </ul>
-    </nav>
-    <br>
     <script>
-            "use strict";
+        "use strict";
 
-            let currentGroup;
-            let currentMonth;
-            let currentYear;
+        let currentGroup;
+        let currentMonth;
+        let currentYear;
 
-            let userRigstsGroup;
+        let userRigstsGroups = [];
 
-            let specifiedElement;
-            let isDataReadyForCreateTable;
+        let specifiedElement;
+        let isDataReadyForCreateTable;
 
-            let cellSelector;
-            let dayParts;
-            let duties;
+        let cellSelector;
+        let dayParts;
+        let duties;
 
-            let paymentWindow;
+        let paymentWindow;
 
-            let monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            let weelDaysNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+        let monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        let weelDaysNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
-            document.getElementById("firstLineButton").addEventListener("click", function () {
-                configAndCreatePage("firstLine", new Date().getMonth()+1, new Date().getFullYear());
-            });
+        let sendEmailBtn = document.getElementById('sendEmailBtn');
+        sendEmailBtn.style.visibility = 'hidden';
 
-            document.getElementById("internalSupportButton").addEventListener("click", function() {
-                configAndCreatePage("internalSupport", new Date().getMonth()+1, new Date().getFullYear());
-            });
+        let paymentsCount = document.getElementById('paymentsCount');
+        paymentsCount.style.visibility = 'hidden';
 
-            document.getElementById("externalSupportButton").addEventListener("click", function() {
-                configAndCreatePage("externalSupport", new Date().getMonth()+1, new Date().getFullYear());
-            });
+        let loader = document.getElementById('loader');
+        loader.style.visibility = 'hidden';
 
-            document.getElementById("sysAdminButton").addEventListener("click", function() {
-                configAndCreatePage("sysAdmin", new Date().getMonth()+1, new Date().getFullYear());
-            });
+        document.getElementById("firstLineButton").addEventListener("click", function() {
+            configAndCreateDytyTable("firstLine", new Date().getMonth() + 1, new Date().getFullYear());
+        });
 
-            document.getElementById("sendEmailBtn").addEventListener("click", function () {
+        document.getElementById("internalSupportButton").addEventListener("click", function() {
+            configAndCreateDytyTable("internalSupport", new Date().getMonth() + 1, new Date().getFullYear());
+        });
+
+        document.getElementById("externalSupportButton").addEventListener("click", function() {
+            configAndCreateDytyTable("externalSupport", new Date().getMonth() + 1, new Date().getFullYear());
+        });
+
+        document.getElementById("sysAdminButton").addEventListener("click", function() {
+            configAndCreateDytyTable("sysAdmin", new Date().getMonth() + 1, new Date().getFullYear());
+        });
+
+        document.getElementById("sendEmailBtn").addEventListener("click", function() {
+
+            swal({
+                title: "Вы уверены?",
+                text: "Вы точно уверены, что хотите отправить e-mail оповещение о графике дежурств всем дежурным?",
+                type: "warning",
+                showCancelButton: true,
+                closeOnConfirm: true,
+                confirmButtonText: "Да, отправляем!",
+                cancelButtonText: "Отмена",
+                confirmButtonColor: "#ec6c62"
+            }, function() {
                 sendEmailNotification();
             });
+        });
 
-            document.getElementById("paymentsCount").addEventListener("click", function () {
-                countPayments();
-            });
+        document.getElementById("paymentsCount").addEventListener("click", function() {
+            countPayments();
+        });
 
-            document.addEventListener('click', function(event) {
-                if (specifiedElement == null )
-                    return;
-                var isClickInside = specifiedElement.contains(event.target);
-                if (!isClickInside) {
-                    disableSelection(document.getElementById("select"));
-                    specifiedElement = null ;
-                }
-            });
-
-            document.getElementById("monthMinus").addEventListener("click", function() {
-                if(currentMonth-1 == 0){
-                    currentMonth = 12;
-                    currentYear--;
-                }
-                else{
-                    currentMonth--;
-                }
-                configAndCreatePage(currentGroup, currentMonth, currentYear);
-                getAndRefreshPaymentsData();
-            });
-
-            document.getElementById("monthPlus").addEventListener("click", function() {
-                if(currentMonth+1 == 13){
-                    currentMonth = 1;
-                    currentYear++;
-                }
-                else{
-                    currentMonth++;
-                }
-                configAndCreatePage(currentGroup, currentMonth, currentYear);
-                getAndRefreshPaymentsData();
-            });
-
-            checkAuthorization();
-
-            function checkAuthorization() {
-                let xhr = new XMLHttpRequest();
-                xhr.open('GET', 'https://localhost:44344/api/Auth', true);
-                xhr.setRequestHeader('Content-Type', 'applicat ion/json');
-                xhr.useDefaultHeader = false;
-                xhr.send();
-                xhr.onload = function () {
-                    userRigstsGroup = JSON.parse(this.response).Responce;
-                    if (userRigstsGroup == null) {
-                        configAndCreatePage("firstLine", new Date().getMonth() + 1, new Date().getFullYear());
-                    } else {
-                        configAndCreatePage(userRigstsGroup, new Date().getMonth() + 1, new Date().getFullYear());
-                    }
-                };
-            }
-
-            function configAndCreatePage(group, month, year)
-            {
-                currentGroup = group;
-                currentMonth = month;
-                currentYear = year;
+        document.addEventListener('click', function(event) {
+            if (specifiedElement == null)
+                return;
+            var isClickInside = specifiedElement.contains(event.target);
+            if (!isClickInside) {
+                disableSelection(document.getElementById("select"));
                 specifiedElement = null;
-                isDataReadyForCreateTable = 0;
-
-                getСellSelector();
-                getDayParts();
-                getDuties();
-
-                document.getElementById("currentMonth").textContent =  monthNames[currentMonth-1] + ' ' +  currentYear;
             }
+        });
 
-            function getСellSelector()
-            {
-                let xhr = new XMLHttpRequest();
-                xhr.open('GET', 'https://localhost:44344/api/User/?group=' + currentGroup, true);
-                    xhr.setRequestHeader('Content-Type', 'applicat ion/json');
-                    xhr.useDefaultHeader = false;
-                    xhr.send();
-                    xhr.onload = function() {
-                        cellSelector = JSON.parse(this.response).Responce;
-                        cellSelector.forEach(function(item, i, arr) {
-                            item.isSelected = false;
-                        });
-                        isDataReadyForCreateTable++;
-                        tryCeateDutyTable(currentGroup, currentMonth, currentYear);
-                    };
-            }
+        checkAuthorization();
 
-            function getDayParts() {
-                let xhr = new XMLHttpRequest();
-                xhr.open('GET', 'https://localhost:44344/api/PartOfDay/?group=' + currentGroup, true);
-                xhr.setRequestHeader('Content-Type', 'applicat ion/json');
-                xhr.useDefaultHeader = false;
-                xhr.send();
-                xhr.onload = function() {
-                    dayParts = JSON.parse(this.response);
-                    isDataReadyForCreateTable++;
-                    tryCeateDutyTable(currentGroup, currentMonth, currentYear);
-                };
-            }
+        function checkAuthorization() {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/Auth', true);
+            xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.useDefaultHeader = false;
+            xhr.send();
+            xhr.onload = function() {
+                let userRigstsGroupsObject = JSON.parse(this.response).Responce;
+                userRigstsGroupsObject.forEach(function(item, i, arr) {
+                    userRigstsGroups.push(item.usergroup);
+                });
 
-            function getDuties() {
-                let xhr = new XMLHttpRequest();
-                xhr.open('GET', 'https://localhost:44344/api/Duty/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
-                xhr.setRequestHeader('Content-Type', 'applicat ion/json');
-                xhr.useDefaultHeader = false;
-                xhr.send();
-                xhr.onload = function() {
-                    duties = JSON.parse(this.response);
-                    isDataReadyForCreateTable++;
-                    tryCeateDutyTable(currentGroup, currentMonth, currentYear);
+                if (userRigstsGroups.length == 0) {
+                    configAndCreateDytyTable("firstLine", new Date().getMonth() + 1, new Date().getFullYear());
+                } else {
+                    configAndCreateDytyTable(userRigstsGroups[0], new Date().getMonth() + 1, new Date().getFullYear());
                 }
-            }
+            };
+        }
 
-            function tryCeateDutyTable(){
-                if(isDataReadyForCreateTable==3){
-                    createDutyTable();
-                }
+        function configurateSendEmailOrCheckPaimentsButtonsVisibility(group) {
+            if ((group == "internalSupport" || group == "externalSupport") && userRigstsGroups.includes(currentGroup)) {
+                paymentsCount.style.visibility = 'visible';
+                sendEmailBtn.style.visibility = 'visible';
             }
+        }
 
-            function sendEmailNotification() {
-                let xhr = new XMLHttpRequest();
-                xhr.open('POST', 'https://localhost:44344/api/Mail/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
-                xhr.setRequestHeader('Content-Type', 'applicat ion/json');
-                xhr.useDefaultHeader = false;
-                xhr.send();
-                xhr.onload = function () {
-                    //написать код уведомления об успешной отправке
-                };
+        function configAndCreateDytyTable(group, month, year) {
+            sendEmailBtn.style.visibility = 'hidden';
+            paymentsCount.style.visibility = 'hidden';
+
+            currentGroup = group;
+            currentMonth = month;
+            currentYear = year;
+            specifiedElement = null;
+            isDataReadyForCreateTable = 0;
+
+            getСellSelector();
+            getDayParts();
+            getDuties();
+
+            loader.style.visibility = 'visible';
+
+            if (userRigstsGroups.length != 0) {
+                configurateSendEmailOrCheckPaimentsButtonsVisibility(group);
             }
+        }
 
-            function countPayments() {
+        function getСellSelector() {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/User/?group=' + currentGroup, true);
+            xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.useDefaultHeader = false;
+            xhr.send();
+            xhr.onload = function() {
+                cellSelector = JSON.parse(this.response).Responce;
+                cellSelector.forEach(function(item, i, arr) {
+                    item.isSelected = false;
+                });
+                isDataReadyForCreateTable++;
+                tryCeateDutyTable(currentGroup, currentMonth, currentYear);
+            };
+        }
+
+        function getDayParts() {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/PartOfDay/?group=' + currentGroup, true);
+            xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.useDefaultHeader = false;
+            xhr.send();
+            xhr.onload = function() {
+                dayParts = JSON.parse(this.response);
+                isDataReadyForCreateTable++;
+                tryCeateDutyTable(currentGroup, currentMonth, currentYear);
+            };
+        }
+
+        function getDuties() {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/Duty/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
+            xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.useDefaultHeader = false;
+            xhr.send();
+            xhr.onload = function() {
+                duties = JSON.parse(this.response);
+                isDataReadyForCreateTable++;
+                tryCeateDutyTable(currentGroup, currentMonth, currentYear);
+            }
+        }
+
+        function tryCeateDutyTable() {
+            if (isDataReadyForCreateTable == 3) {
+                createDutyTable();
+                loader.style.visibility = 'hidden';
+            }
+        }
+
+        function sendEmailNotification() {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/Mail/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
+            xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.useDefaultHeader = false;
+            xhr.send();
+        }
+
+        function countPayments() {
+            if (paymentWindow == undefined || paymentWindow.closed) {
                 paymentWindow = window.open("@Url.Action("Index", "PayWindow")", "paymentWindow", "width=500,height=500");
-                paymentWindow.onload = function() { getAndRefreshPaymentsData()};
+                paymentWindow.focus();
+            } else {
+                paymentWindow.focus();
             }
+            paymentWindow.onload = function() { getAndRefreshPaymentsData() };
+        }
 
-            function getAndRefreshPaymentsData() {
-                paymentWindow.getAndRefreshPaymentsData(currentGroup, currentMonth, currentYear);
+        function getAndRefreshPaymentsData() {
+            let xhr = new XMLHttpRequest();
+            xhr.open('get', '/api/Payment/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
+            xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.useDefaultHeader = false;
+            xhr.send();
+            xhr.onload = function() {
+                if (paymentWindow !== undefined || !paymentWindow.closed) {
+                    let paymentData = JSON.parse(this.response).Responce;
+                    paymentWindow.createPaymentTable(paymentData);
+                }
             }
+        }
 
-            function transformSelectorToText(selector){
+
+            function transformSelectorToText(selector) {
                 let text = "";
                 selector.forEach(function(item, i, arr) {
-                    if(item.isSelected == true){
-                        if(text != "") {
+                    if (item.isSelected == true) {
+                        if (text != "") {
                             text += ", ";
                         }
                         text += item.Name;
                     }
                 });
-                return  text;
+                return text;
             }
 
-            function transformSelectorToMultiselect(selector){
+            function transformSelectorToMultiselect(selector) {
                 let text = "<select id='select' multiple>";
                 selector.forEach(function(item, i, arr) {
 
-                    if(item.isSelected == true){
-                        text +="<option selected>";
+                    //если пользователь скрыт и не выбран, то его не будет в выпадашке
+                    if (item.IsHidden == true && item.isSelected == false) {
+                        return;
                     }
-                    else{
+
+                    if (item.isSelected == true) {
+                        text += "<option selected>";
+                    } else {
                         text += "<option>";
                     }
                     text += item.Name;
                     text += "</option>";
                 });
-                return  text;
+                return text;
             }
 
             function getSelectValues(select, cell) {
                 let options = select && select.options;
                 for (let i = 0, iLen = options.length; i < iLen; i++) {
-                    let User = cell.cellSelector.find(function(element, index, array){
+                    let User = cell.cellSelector.find(function(element, index, array) {
                         if (element.Name == options[i].text)
-                        return true;
-                        });
+                            return true;
+                    });
 
                     if (options[i].selected) {
                         User.isSelected = true;
-                    }
-                    else{
+                    } else {
                         User.isSelected = false;
                     }
                 }
             }
+
             function daysInMonth(month, year) {
-                return new Date(year,month,0).getDate();
+                return new Date(year, month, 0).getDate();
             }
+
             function FindTableElement(rowNumber, colomnNumber) {
                 let All = document.getElementById("dutyTable").getElementsByTagName('*');
                 for (let i = 0; i < All.length; i++) {
@@ -273,17 +308,16 @@
                     }
                 }
             }
+
             function createDutyTable() {
                 let daysCount = daysInMonth(currentMonth, currentYear);
                 let table = document.getElementById("dutyTable");
                 table.innerHTML = "";
 
                 //делаем столбцы одинаковой ширины
-
-                for (let rowNumber = 0; rowNumber <= dayParts.Responce.length; rowNumber++)
-                {
+                for (let rowNumber = 0; rowNumber <= dayParts.Responce.length; rowNumber++) {
                     let col = document.createElement('col');
-                    col.style = 'width:' + (100/(dayParts.Responce.length+1)).toFixed() + '%';
+                    col.style = 'width:' + (100 / (dayParts.Responce.length + 1)).toFixed() + '%';
                     table.appendChild(col);
 
                 }
@@ -291,25 +325,29 @@
                 //рисуем макет таблицы
                 for (let rowNumber = 0; rowNumber <= daysCount; rowNumber++) {
                     let row = table.insertRow(rowNumber);
-                    if(rowNumber==0) row.classList.add("darkTableHead");
-                    if(rowNumber%2!=0) row.classList.add("darkTableLine");
+                    if (rowNumber == 0) row.classList.add("darkTableHead");
+                    if (rowNumber % 2 != 0) row.classList.add("darkTableLine");
                     for (let colomnNumber = 0; colomnNumber <= dayParts.Responce.length; colomnNumber++) {
                         let cell = row.insertCell(colomnNumber);
                         cell.setAttribute("colomnNumber", colomnNumber);
                         cell.setAttribute("rowNumber", rowNumber);
                         cell.colomnNumber = colomnNumber;
                         cell.rowNumber = rowNumber;
-                        cell.cellSelector =  JSON.parse(JSON.stringify(cellSelector));
-                        if (rowNumber != 0 & colomnNumber != 0 & currentGroup == userRigstsGroup) {
+                        cell.cellSelector = JSON.parse(JSON.stringify(cellSelector));
+                        if (rowNumber != 0 & colomnNumber != 0 & userRigstsGroups.includes(currentGroup)) {
                             cell.addEventListener('click', function(event) {
-                            enableSelection(cell);
-                        });
+                                enableSelection(cell);
+                            });
                         }
 
                         let veekDayNumber = (new Date(currentMonth + "/" + rowNumber + "/" + currentYear)).getDay();
 
-                        if(veekDayNumber==5 || veekDayNumber==6 ){
+                        if (veekDayNumber == 5 || veekDayNumber == 6) {
                             cell.parentElement.classList.add("darkWeekendLine");
+                        }
+
+                        if (colomnNumber == 0 && rowNumber == 0) {
+                            createMonthSelector(cell);
                         }
 
                         if (colomnNumber == 0 && rowNumber != 0) {
@@ -322,11 +360,60 @@
                 processDayParts(dayParts);
             }
 
+            function createMonthSelector(cell) {
+                cell.innerHTML = '<a id="monthMinus" class="monthMinus">←</a><a id="currentMonth" class="currentMonth"></a><a id="monthPlus" class="monthPlus">→</a>';
+
+                document.getElementById("currentMonth").textContent = monthNames[currentMonth - 1] + ' ' + currentYear;
+
+                document.getElementById("monthMinus").addEventListener("click", function() {
+                    if (currentMonth - 1 == 0) {
+                        currentMonth = 12;
+                        currentYear--;
+                    } else {
+                        currentMonth--;
+                    }
+                    configAndCreateDytyTable(currentGroup, currentMonth, currentYear);
+                    getAndRefreshPaymentsData();
+                });
+
+                $('#currentMonth').monthpicker({
+                    pattern: 'mmm yyyy',
+                    selectedYear: currentYear,
+                    startYear: parseInt(currentYear) - 2,
+                    finalYear: parseInt(currentYear) + 2,
+                    openOnFocus: true,
+                    selectedMonth: "Январь",
+                    monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"]
+                });
+
+                $('#currentMonth').bind('click', function() {
+                    $('#currentMonth').monthpicker('show');
+                });
+
+                $('#currentMonth').monthpicker().bind('monthpicker-click-month', function(e, month) {
+                    currentMonth = month;
+                    configAndCreateDytyTable(currentGroup, currentMonth, currentYear);
+                }).bind('monthpicker-change-year', function(e, year) {
+                    currentYear = year;
+                });
+
+                document.getElementById("monthPlus").addEventListener("click", function() {
+                    if (currentMonth + 1 == 13) {
+                        currentMonth = 1;
+                        currentYear++;
+                    } else {
+                        currentMonth++;
+                    }
+                    configAndCreateDytyTable(currentGroup, currentMonth, currentYear);
+                    getAndRefreshPaymentsData();
+                });
+            }
+
             function processDuties(result) {
                 result.Responce.forEach(function(item, i, arr) {
-                    let element = FindTableElement(item.Day, item.PartOfDay.Id)
+                    let element = FindTableElement(item.Day, item.PartOfDay.Sortpos);
                     element.cellSelector.forEach(function(user, j, arra) {
-                        if(user.Id == item.User.Id){
+                        if (user.Id == item.User.Id) {
                             user.isSelected = true;
                         }
                     });
@@ -336,25 +423,29 @@
 
             function processDayParts(result) {
                 result.Responce.forEach(function(item, i, arr) {
-                    let element = FindTableElement(0, item.Sortpos)
+                    let element = FindTableElement(0, item.Sortpos);
                     element.innerHTML += item.Description;
                 });
             }
+
             function enableSelection(element) {
-                if (specifiedElement != null )  return;
+                if (specifiedElement != null) return;
                 element.innerHTML = transformSelectorToMultiselect(element.cellSelector);
 
                 //http://wenzhixin.net.cn/p/multiple-select/docs/#browser-compatibility
-                $('#select').change(function()
-                {$(this).val();}).multipleSelect({
+                $('#select').change(function() {
+                    $(this).val();
+                }).multipleSelect({
                     width: '100%',
                     isOpen: true,
                     keepOpen: true,
                     selectAll: false
                 });
 
+
+
                 specifiedElement = element;
-                element.onclick = null ;
+                element.onclick = null;
             }
 
             function disableSelection(element) {
@@ -369,18 +460,18 @@
                     Id: "Duty",
                     Selector: cell.cellSelector,
                     DayPart: cell.colomnNumber,
-                    Date: currentYear + "." +  currentMonth + "." + cell.rowNumber
+                    Date: currentYear + "." + currentMonth + "." + cell.rowNumber
                 }
 
                 var xhr = new XMLHttpRequest();
 
                 var json = JSON.stringify(request);
 
-                xhr.open("POST", 'https://localhost:44344/api/Duty/?group=' + currentGroup, true);
+                xhr.open("POST", '/api/Duty/?group=' + currentGroup, true);
                 xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
                 xhr.send(json);
 
-                xhr.onload = function () {
+                xhr.onload = function() {
                     getAndRefreshPaymentsData();
                 };
             }
@@ -389,8 +480,7 @@
                 var result;
                 if (number < 10) {
                     result = "0" + number.toString();
-                }
-                else {
+                } else {
                     result = number.toString();
                 }
                 return result;

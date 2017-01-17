@@ -18,7 +18,7 @@ namespace Duty2.Controllers
 
             foreach (var user in users)
             {
-                result.Add(new User() {Id = user.Id, Name = user.Name});
+                result.Add(new User() {Id = user.Id, Name = user.Name, IsHidden = user.IsHidden});
             }
 
             return new Resp()

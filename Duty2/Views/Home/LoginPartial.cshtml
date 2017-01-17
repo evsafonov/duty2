@@ -1,26 +1,17 @@
 ﻿@if (Request.IsAuthenticated)
 {
-    <text>
-        <ul class="nav navbar-nav navbar-right">
-            <li class="navbar-text">
-                @if (User.Identity.Name != null)
-                {
-                    <text>Здравствуйте, @User.Identity.Name!</text>
-                }
-                else
-                {
-                    <text>Здравствуйте</text>
-                }
-            </li>
-            <li>
-                @Html.ActionLink("Выйти", "SignOut", "Account")
-            </li>
-        </ul>
-    </text>
+    if (User.Identity.Name != null)
+     {
+         <a class="nav-text">Здравствуйте, @User.Identity.Name!</a>
+    }
+    else
+    {
+        <a class="nav-text">Здравствуйте</a>
+    }
+
+    @Html.ActionLink("Выйти", "SignOut", "Account")
 }
 else
 {
-    <ul class="nav navbar-nav navbar-right">
-        <li>@Html.ActionLink("Sign in", "SignIn", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
-    </ul>
+    <a class="nav-text">@Html.ActionLink("Sign in", "SignIn", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</a>
 }

@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.WsFederation;
 using Microsoft.Owin.Security;
+using NLog;
 
 namespace Duty2.Controllers
 {

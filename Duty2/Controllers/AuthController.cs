@@ -10,18 +10,21 @@ namespace Duty2.Controllers
     {
         public Resp Get()
         {
-            string userGroup = null;
             var claimsIdentity = ((HttpContextWrapper)Request.Properties["MS_HttpContext"]).User.Identity as ClaimsIdentity;
-            var userGroupClaim = claimsIdentity?.Claims.FirstOrDefault(c => c.Type == "http://2gis.local/Duty/DutyGroups");
-            if (userGroupClaim != null)
+            var userGroupClaims = claimsIdentity?.Claims.Where(c => c.Type == "http://2gis.local/Duty/DutyGroups");
+            if (userGroupClaims != null)
             {
-                userGroup = userGroupClaim.Value;
+                var userGroups = from c in userGroupClaims select new {usergroup = c.Value};
+                return new Resp()
+                {
+                    Id = "IsUserAuthorized",
+                    Responce = userGroups
+                };
             }
-
             return new Resp()
             {
                 Id = "IsUserAuthorized",
-                Responce = userGroup
+                Responce = null
             };
         }
     }

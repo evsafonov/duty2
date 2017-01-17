@@ -47,7 +47,7 @@ namespace Duty2.Controllers
                 foreach (var dutyDayPart in dutyDayParts)
                 {
                     htmlToEmail += "<td>";
-                    htmlToEmail += dutyDayPart.Description;
+                    htmlToEmail += dutyDayPart.TimeFrom + " - " + dutyDayPart.TimeTo;
                     htmlToEmail += "</td> ";
                 }
                 htmlToEmail += "</tr>";

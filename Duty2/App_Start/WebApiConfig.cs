@@ -1,4 +1,5 @@
 ﻿using System.Web.Http;
+using Duty2.Helpers;
 
 namespace Duty2
 {
@@ -6,9 +7,7 @@ namespace Duty2
     {
         public static void Register(HttpConfiguration config)
         {
-            // Конфигурация и службы веб-API
-
-            config.EnableCors();
+            config.Filters.Add(new CustomExceptionFilterAttribute());
 
             // Маршруты веб-API
             config.MapHttpAttributeRoutes();

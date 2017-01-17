@@ -1,5 +1,5 @@
-﻿using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using Duty2.Helpers;
 
 namespace Duty2
 {
@@ -8,6 +8,7 @@ namespace Duty2
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
+            
         }
     }
 }

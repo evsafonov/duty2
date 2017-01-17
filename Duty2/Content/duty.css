@@ -1,27 +1,44 @@
 .menu {
-  width: 100%;	
-  justify-content: space-between;
-  display: flex;
-}
-
-.menu nav {
-  margin: 0 auto 30px;
-  text-align: center;
-  }
-
-.menu a {
-  text-decoration: none;
-  transition: .5s linear;
   width: 100%;
-  padding: 0.5em;
-  color: #9B4222;
-  background: rgba(255, 171, 81, .3);
-  cursor: default;
-  
-  display: inline;
-  
+  height: 30px;
+  background-color: rgba(255, 171, 81, .3);
 }
-.menu a:hover {background: #FFAB51}
+
+.nav-menu {
+  width: 90%;
+  margin: auto;
+}
+
+.nav-menu div{
+  display: inline;
+  margin-top: 5px;
+}
+
+.menu-bar {
+  float: left;
+}
+
+.nav-bar {
+  float: right;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    transition: .5s linear;
+    user-select: none;
+    padding: 0.5em;
+    color: #9B4222;
+    cursor: default;
+    display: inline;
+    margin-top: 50px;
+}
+.menu a:hover {background: #FFAB51;}
+.menu a.nav-text:hover {background: inherit;}
+
+#paymentsCount {
+    padding-left: 10px;
+    padding-right: 10px;
+}
 
 .dutyTable {
 	width: 90%;
@@ -35,6 +52,10 @@
     border: 1px solid #FFAB51; 
 }
 
+.monthPickerTable {
+    padding: 4px;
+    border: 1px solid #FFAB51; 
+}
 
 td {
     padding: 6px;
@@ -56,25 +77,169 @@ td {
 	background: rgba(255, 171, 81, .3);
 }
 
-.monthSelector nav {
-  display: block;
-  margin: 0 auto 30px;
-
+tr.darkTableHead td{
+  background-color: #FFAB51;
+  text-align: center;
 }
 
-.monthSelector ul {
-  list-style: none; 
-  display: -webkit-flex; 
-  width: 15%;
-  margin: 0 auto;
-}
-.monthSelector a {
+td a.monthMinus{
+  cursor: default;
+  color: black;
   text-decoration: none;
-  transition: .5s linear;
-  padding: 0.5em;
-  display: block;
+  /*margin-right: 15px;*/
+  float: left;
+}
+
+td a.monthMinus:hover {
   color: #9B4222;
-  background: rgba(255, 171, 81, .3);
+  transition: .5s linear;
   cursor: default;
 }
-.monthSelector a:hover {background: #FFAB51}
+
+td a.currentMonth{
+  text-align: center;
+  text-decoration: none;
+  color: black;
+  cursor: default;
+}
+
+td a.currentMonth:hover{
+  text-align: center;
+  text-decoration: none;
+  color: #9B4222;
+  transition: .5s linear;
+  cursor: default;
+}
+
+
+td a.monthPlus{
+    cursor: default;
+    color: black;
+    text-decoration: none;
+    float: right;
+}
+
+td a.monthPlus:hover {
+  color: #9B4222;
+  transition: .5s linear;
+  cursor: default;
+}
+
+#loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #FFAB51;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Add animation to "page content" */
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+  from { bottom:-100px; opacity:0 } 
+  to { bottom:0px; opacity:1 }
+}
+
+@keyframes animatebottom { 
+  from{ bottom:-100px; opacity:0 } 
+  to{ bottom:0; opacity:1 }
+}
+
+#myDiv {
+  display: none;
+  text-align: center;
+}
+
+.ui-datepicker {
+    background-color: whitesmoke;
+    background-size: auto;
+    border: 1px  #FFAB51;
+    border-width: 1px;
+    font-size: 15.4px;
+    height: 143px;
+    left: 118px;
+    line-height: 22px;
+    text-align: center;
+    top: 111px;
+    white-space: nowrap;
+    z-index: 999999;
+    zoom: 1;
+}
+
+div.mtz-monthpicker {
+    background-attachment: scroll;
+    background-image: url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/base/images/ui-bg_highlight-soft_75_cccccc_1x100.png);
+    display: block;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 15.4px;
+    font-weight: bold;
+    height: 30.1563px;
+    line-height: 22px;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    border-left: 1px #FFAB51 solid;
+    border-right: 1px #FFAB51 solid;
+    border-top: 1px #FFAB51 solid;
+}
+
+table.mtz-monthpicker {
+    padding: 4px;
+    border: 1px solid #FFAB51; 
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(51, 51, 51);
+    display: table;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 13.86px;
+    font-style: normal;
+    font-variant-caps: normal;
+    font-variant-ligatures: normal;
+    font-weight: normal;
+    height: 113px;
+    line-height: normal;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    white-space: normal;
+    width: 100%;
+}
+
+select.mtz-monthpicker {
+    align-items: center;
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    cursor: default;
+    display: inline-block;
+    height: 22px;
+    width: 64px;
+    border-color: #FFAB51
+}
