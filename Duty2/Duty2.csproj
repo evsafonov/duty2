@@ -256,6 +256,10 @@
     <Compile Include="Migrations\201701160530597_changeDayPartDiscription.Designer.cs">
       <DependentUpon>201701160530597_changeDayPartDiscription.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201701170622333_PhoneNumber.cs" />
+    <Compile Include="Migrations\201701170622333_PhoneNumber.Designer.cs">
+      <DependentUpon>201701170622333_PhoneNumber.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\DataContext.cs" />
     <Compile Include="Models\PartOfDay.cs" />
@@ -273,6 +277,7 @@
     <Content Include="packages.config" />
     <Content Include="Views\Home\View.cshtml" />
     <Compile Include="App_Start\Srartup.Auth.cs" />
+    <None Include="Properties\PublishProfiles\uk-duty01.pubxml" />
     <None Include="Views\Home\LoginPartial.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\PayWindow\Index.cshtml" />
@@ -301,6 +306,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201701160530597_changeDayPartDiscription.resx">
       <DependentUpon>201701160530597_changeDayPartDiscription.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701170622333_PhoneNumber.resx">
+      <DependentUpon>201701170622333_PhoneNumber.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

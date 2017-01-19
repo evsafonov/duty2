@@ -175,6 +175,7 @@
                 cellSelector = JSON.parse(this.response).Responce;
                 cellSelector.forEach(function(item, i, arr) {
                     item.isSelected = false;
+                    item.sortpos = 0;
                 });
                 isDataReadyForCreateTable++;
                 tryCeateDutyTable(currentGroup, currentMonth, currentYear);
@@ -239,7 +240,7 @@
             xhr.useDefaultHeader = false;
             xhr.send();
             xhr.onload = function() {
-                if (paymentWindow !== undefined || !paymentWindow.closed) {
+                if (paymentWindow != undefined && !paymentWindow.closed) {
                     let paymentData = JSON.parse(this.response).Responce;
                     paymentWindow.createPaymentTable(paymentData);
                 }
@@ -249,7 +250,8 @@
 
             function transformSelectorToText(selector) {
                 let text = "";
-                selector.forEach(function(item, i, arr) {
+                selector = selector.sort((a, b) => a.sortpos > b.sortpos);
+                selector.forEach(function (item, i, arr) {
                     if (item.isSelected == true) {
                         if (text != "") {
                             text += ", ";
@@ -262,7 +264,8 @@
 
             function transformSelectorToMultiselect(selector) {
                 let text = "<select id='select' multiple>";
-                selector.forEach(function(item, i, arr) {
+                selector = selector.sort((a, b) => a.Name > b.Name);
+                selector.forEach(function (item, i, arr) {
 
                     //если пользователь скрыт и не выбран, то его не будет в выпадашке
                     if (item.IsHidden == true && item.isSelected == false) {
@@ -287,6 +290,15 @@
                         if (element.Name == options[i].text)
                             return true;
                     });
+
+                    let userNewSortpos;
+                    if (document.getElementById(User.Name) != undefined) {
+                        userNewSortpos = document.getElementById(User.Name).sortpos;
+                    }
+                    
+                    if (userNewSortpos != null || userNewSortpos > 0) {
+                        User.sortpos = userNewSortpos;
+                    }
 
                     if (options[i].selected) {
                         User.isSelected = true;
@@ -415,6 +427,7 @@
                     element.cellSelector.forEach(function(user, j, arra) {
                         if (user.Id == item.User.Id) {
                             user.isSelected = true;
+                            user.sortpos = item.Sortpos;
                         }
                     });
                     element.innerHTML = transformSelectorToText(element.cellSelector);
@@ -439,10 +452,9 @@
                     width: '100%',
                     isOpen: true,
                     keepOpen: true,
-                    selectAll: false
+                    selectAll: false,
+                    selectorSortpos: element.cellSelector.sort((a, b) => a.sortpos < b.sortpos)[0].sortpos
                 });
-
-
 
                 specifiedElement = element;
                 element.onclick = null;

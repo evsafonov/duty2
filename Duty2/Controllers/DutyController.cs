@@ -32,7 +32,8 @@ namespace Duty2.Controllers
                 Day = duty.Date.Day,
                 PartOfDay = duty.PartOfDay,
                 Id = duty.Id,
-                User = duty.User
+                User = duty.User,
+                Sortpos = duty.Sortpos
             });
 
             return new Resp()
@@ -82,7 +83,8 @@ namespace Duty2.Controllers
                     {
                         User = await db.Users.FindAsync(item.Id),
                         Date = selectorContainer.Date.Date,
-                        PartOfDay = await db.DayParts.Where(d => d.Sortpos == selectorContainer.DayPart).FirstAsync()
+                        PartOfDay = await db.DayParts.Where(d => d.Sortpos == selectorContainer.DayPart).FirstAsync(),
+                        Sortpos = item.sortpos
                     });
                 }
 
