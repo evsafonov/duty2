@@ -1,5 +1,4 @@
-﻿
-namespace Duty2.DTOs
+﻿namespace Duty2.DTOs
 {
     class UserPayment
     {

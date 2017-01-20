@@ -256,6 +256,10 @@
     <Compile Include="Migrations\201701160530597_changeDayPartDiscription.Designer.cs">
       <DependentUpon>201701160530597_changeDayPartDiscription.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201701170622333_PhoneNumber.cs" />
+    <Compile Include="Migrations\201701170622333_PhoneNumber.Designer.cs">
+      <DependentUpon>201701170622333_PhoneNumber.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\DataContext.cs" />
     <Compile Include="Models\PartOfDay.cs" />
@@ -273,7 +277,7 @@
     <Content Include="packages.config" />
     <Content Include="Views\Home\View.cshtml" />
     <Compile Include="App_Start\Srartup.Auth.cs" />
-    <None Include="Views\Home\LoginPartial.cshtml" />
+    <None Include="Properties\PublishProfiles\uk-duty01.pubxml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\PayWindow\Index.cshtml" />
     <None Include="Web.Debug.config">
@@ -302,6 +306,9 @@
     <EmbeddedResource Include="Migrations\201701160530597_changeDayPartDiscription.resx">
       <DependentUpon>201701160530597_changeDayPartDiscription.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701170622333_PhoneNumber.resx">
+      <DependentUpon>201701170622333_PhoneNumber.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -314,15 +321,16 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>49925</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>https://localhost:44344/</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>https://localhost:44344/</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>https://duty.2gis.one/</CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

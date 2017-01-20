@@ -381,7 +381,13 @@
                     instance: that
                 });
             });
+
+            let options = this.options;
             this.$selectItems.off('click').on('click', function () {
+
+                $(this).parents('li')[0].sortpos = ++options.selectorSortpos;
+                $(this).parents('li')[0].id = $(this).parent().text();
+
                 that.updateSelectAll();
                 that.update();
                 that.updateOptGroupSelect();
@@ -501,6 +507,8 @@
 
             // add selected class to selected li
             this.$drop.find('li').removeClass('selected');
+
+            
             this.$drop.find('input:checked').each(function () {
                 $(this).parents('li').first().addClass('selected');
             });
@@ -534,12 +542,31 @@
             });
         },
 
+
         //value or text, default: 'value'
         getSelects: function (type) {
+            let sortElements = function(a, b) {
+                if (a.parentElement.parentElement.sortpos == null || a.parentElement.parentElement.sortpos == undefined) {
+                    a.parentElement.parentElement.sortpos = 0;
+                }
+
+                if (b.parentElement.parentElement.sortpos == null || b.parentElement.parentElement.sortpos == undefined) {
+                    b.parentElement.parentElement.sortpos = 0;
+                }
+
+                if (a.parentElement.parentElement.sortpos < b.parentElement.parentElement.sortpos) {
+                    return -1;
+                } else if (a.parentElement.parentElement.sortpos > b.parentElement.parentElement.sortpos) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            };
+
             var that = this,
                 texts = [],
                 values = [];
-            this.$drop.find(sprintf('input[%s]:checked', this.selectItemName)).each(function () {
+            this.$drop.find(sprintf('input[%s]:checked', this.selectItemName)).sort(sortElements).each(function () {
                 texts.push($(this).parents('li').first().text());
                 values.push($(this).val());
             });
@@ -735,6 +762,7 @@
         addTitle: false,
         filterAcceptOnEnter: false,
         hideOptgroupCheckboxes: false,
+        selectorSortpos: 0,
 
         selectAllText: 'Select all',
         allSelected: 'All selected',

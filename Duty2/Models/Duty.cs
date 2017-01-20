@@ -8,5 +8,6 @@ namespace Duty2.Models
         public User User { get; set; }
         public DateTime Date { get; set; } 
         public PartOfDay PartOfDay { get; set; }
+        public int Sortpos { get; set; }
     }
 }

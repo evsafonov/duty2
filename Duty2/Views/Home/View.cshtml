@@ -30,7 +30,26 @@
             <div class="nav-bar">
                 <a id="paymentsCount" title="Посчитать оплату">&#8381;</a>
                 <a id="sendEmailBtn" title="Отправить E-mail">&#9993;</a>
-                @Html.Partial("LoginPartial")
+                
+                @if (Request.IsAuthenticated)
+                {
+                    if (User.Identity.Name != null)
+                    {
+                        <a class="nav-text">Здравствуйте, @User.Identity.Name!</a>
+                    }
+                    else
+                    {
+                        <a class="nav-text">Здравствуйте</a>
+                    }
+
+                    @Html.ActionLink("Выйти", "SignOut", "Account")
+                }
+                else
+                {
+                    <a class="nav-text">@Html.ActionLink("Войти", "SignIn", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</a>
+                }
+
+                
             </div>
         </div>
     </div>
@@ -58,7 +77,7 @@
         let paymentWindow;
 
         let monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        let weelDaysNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+        let weelDaysNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" ];
 
         let sendEmailBtn = document.getElementById('sendEmailBtn');
         sendEmailBtn.style.visibility = 'hidden';
@@ -121,6 +140,7 @@
             let xhr = new XMLHttpRequest();
             xhr.open('GET', '/api/Auth', true);
             xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.setRequestHeader('Accept', '*/*');
             xhr.useDefaultHeader = false;
             xhr.send();
             xhr.onload = function() {
@@ -169,12 +189,14 @@
             let xhr = new XMLHttpRequest();
             xhr.open('GET', '/api/User/?group=' + currentGroup, true);
             xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.setRequestHeader('Accept', '*/*');
             xhr.useDefaultHeader = false;
             xhr.send();
             xhr.onload = function() {
                 cellSelector = JSON.parse(this.response).Responce;
                 cellSelector.forEach(function(item, i, arr) {
                     item.isSelected = false;
+                    item.sortpos = 0;
                 });
                 isDataReadyForCreateTable++;
                 tryCeateDutyTable(currentGroup, currentMonth, currentYear);
@@ -185,6 +207,7 @@
             let xhr = new XMLHttpRequest();
             xhr.open('GET', '/api/PartOfDay/?group=' + currentGroup, true);
             xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.setRequestHeader('Accept', '*/*');
             xhr.useDefaultHeader = false;
             xhr.send();
             xhr.onload = function() {
@@ -198,6 +221,7 @@
             let xhr = new XMLHttpRequest();
             xhr.open('GET', '/api/Duty/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
             xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.setRequestHeader('Accept', '*/*');
             xhr.useDefaultHeader = false;
             xhr.send();
             xhr.onload = function() {
@@ -218,6 +242,7 @@
             let xhr = new XMLHttpRequest();
             xhr.open('POST', '/api/Mail/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
             xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.setRequestHeader('Accept', '*/*');
             xhr.useDefaultHeader = false;
             xhr.send();
         }
@@ -236,10 +261,11 @@
             let xhr = new XMLHttpRequest();
             xhr.open('get', '/api/Payment/?group=' + currentGroup + "&month=" + currentMonth + "&year=" + currentYear, true);
             xhr.setRequestHeader('Content-Type', 'applicat ion/json');
+            xhr.setRequestHeader('Accept', '*/*');
             xhr.useDefaultHeader = false;
             xhr.send();
             xhr.onload = function() {
-                if (paymentWindow !== undefined || !paymentWindow.closed) {
+                if (paymentWindow != undefined && !paymentWindow.closed) {
                     let paymentData = JSON.parse(this.response).Responce;
                     paymentWindow.createPaymentTable(paymentData);
                 }
@@ -249,7 +275,8 @@
 
             function transformSelectorToText(selector) {
                 let text = "";
-                selector.forEach(function(item, i, arr) {
+                selector = selector.sort((a, b) => a.sortpos > b.sortpos);
+                selector.forEach(function (item, i, arr) {
                     if (item.isSelected == true) {
                         if (text != "") {
                             text += ", ";
@@ -262,7 +289,8 @@
 
             function transformSelectorToMultiselect(selector) {
                 let text = "<select id='select' multiple>";
-                selector.forEach(function(item, i, arr) {
+                selector = selector.sort((a, b) => a.Name > b.Name);
+                selector.forEach(function (item, i, arr) {
 
                     //если пользователь скрыт и не выбран, то его не будет в выпадашке
                     if (item.IsHidden == true && item.isSelected == false) {
@@ -287,6 +315,15 @@
                         if (element.Name == options[i].text)
                             return true;
                     });
+
+                    let userNewSortpos;
+                    if (document.getElementById(User.Name) != undefined) {
+                        userNewSortpos = document.getElementById(User.Name).sortpos;
+                    }
+                    
+                    if (userNewSortpos != null || userNewSortpos > 0) {
+                        User.sortpos = userNewSortpos;
+                    }
 
                     if (options[i].selected) {
                         User.isSelected = true;
@@ -342,7 +379,7 @@
 
                         let veekDayNumber = (new Date(currentMonth + "/" + rowNumber + "/" + currentYear)).getDay();
 
-                        if (veekDayNumber == 5 || veekDayNumber == 6) {
+                        if (veekDayNumber == 0 || veekDayNumber == 6) {
                             cell.parentElement.classList.add("darkWeekendLine");
                         }
 
@@ -415,6 +452,7 @@
                     element.cellSelector.forEach(function(user, j, arra) {
                         if (user.Id == item.User.Id) {
                             user.isSelected = true;
+                            user.sortpos = item.Sortpos;
                         }
                     });
                     element.innerHTML = transformSelectorToText(element.cellSelector);
@@ -439,10 +477,9 @@
                     width: '100%',
                     isOpen: true,
                     keepOpen: true,
-                    selectAll: false
+                    selectAll: false,
+                    selectorSortpos: element.cellSelector.sort((a, b) => a.sortpos < b.sortpos)[0].sortpos
                 });
-
-
 
                 specifiedElement = element;
                 element.onclick = null;
@@ -469,6 +506,7 @@
 
                 xhr.open("POST", '/api/Duty/?group=' + currentGroup, true);
                 xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+                xhr.setRequestHeader('Accept', '*/*');
                 xhr.send(json);
 
                 xhr.onload = function() {
