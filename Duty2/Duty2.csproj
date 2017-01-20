@@ -278,7 +278,6 @@
     <Content Include="Views\Home\View.cshtml" />
     <Compile Include="App_Start\Srartup.Auth.cs" />
     <None Include="Properties\PublishProfiles\uk-duty01.pubxml" />
-    <None Include="Views\Home\LoginPartial.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\PayWindow\Index.cshtml" />
     <None Include="Web.Debug.config">
@@ -322,15 +321,16 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>49925</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>https://localhost:44344/</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>https://localhost:44344/</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>https://duty.2gis.one/</CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
