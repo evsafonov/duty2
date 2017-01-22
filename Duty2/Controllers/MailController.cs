@@ -33,7 +33,7 @@ namespace Duty2.Controllers
             {
                 var currentUserDuties = duties.Where(d => d.User.Id == user.Id).ToList();
 
-                var dutyDates = currentUserDuties.Select(d => d.Date).Distinct().OrderByDescending(d => d.Date);
+                var dutyDates = currentUserDuties.Select(d => d.Date).Where(d => d.Date.Date >= DateTime.Today).Distinct().OrderBy(d => d.Date);
                 var dutyDayParts = db.DayParts.Where(p => p.Group.Description == group).OrderBy(g => g.Sortpos);
 
                 string htmlToEmail =
