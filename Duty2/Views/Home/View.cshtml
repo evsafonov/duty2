@@ -22,14 +22,14 @@
     <div class="menu">
         <div class="nav-menu">
             <div class="menu-bar">
-                <a id="firstLineButton">Первая линия</a>
-                <a id="internalSupportButton">Внутреннее ПО</a>
-                <a id="externalSupportButton">Конечные продукты</a>
-                <a id="sysAdminButton">Системное администрирование</a>
+                <a id="firstLineButtonId">Первая линия</a>
+                <a id="internalSupportButtonId">Внутреннее ПО</a>
+                <a id="externalSupportButtonId">Конечные продукты</a>
+                <a id="sysAdminButtonId">Системное администрирование</a>
             </div>
             <div class="nav-bar">
-                <a id="paymentsCount" title="Посчитать оплату">&#8381;</a>
-                <a id="sendEmailBtn" title="Отправить E-mail">&#9993;</a>
+                <a id="paymentsCountBtnId" title="Посчитать оплату">&#8381;</a>
+                <a id="sendEmailBtnId" title="Отправить E-mail">&#9993;</a>
                 
                 @if (Request.IsAuthenticated)
                 {
@@ -79,32 +79,32 @@
         let monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         let weelDaysNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" ];
 
-        let sendEmailBtn = document.getElementById('sendEmailBtn');
+        let sendEmailBtn = document.getElementById('sendEmailBtnId');
         sendEmailBtn.style.visibility = 'hidden';
 
-        let paymentsCount = document.getElementById('paymentsCount');
+        let paymentsCount = document.getElementById('paymentsCountBtnId');
         paymentsCount.style.visibility = 'hidden';
 
-        let loader = document.getElementById('loader');
-        loader.style.visibility = 'hidden';
+        let pageLoader = document.getElementById('loader');
+        pageLoader.style.visibility = 'hidden';
 
-        document.getElementById("firstLineButton").addEventListener("click", function() {
+        document.getElementById("firstLineButtonId").addEventListener("click", function() {
             configAndCreateDytyTable("firstLine", new Date().getMonth() + 1, new Date().getFullYear());
         });
 
-        document.getElementById("internalSupportButton").addEventListener("click", function() {
+        document.getElementById("internalSupportButtonId").addEventListener("click", function () {
             configAndCreateDytyTable("internalSupport", new Date().getMonth() + 1, new Date().getFullYear());
         });
 
-        document.getElementById("externalSupportButton").addEventListener("click", function() {
+        document.getElementById("externalSupportButtonId").addEventListener("click", function () {
             configAndCreateDytyTable("externalSupport", new Date().getMonth() + 1, new Date().getFullYear());
         });
 
-        document.getElementById("sysAdminButton").addEventListener("click", function() {
+        document.getElementById("sysAdminButtonId").addEventListener("click", function () {
             configAndCreateDytyTable("sysAdmin", new Date().getMonth() + 1, new Date().getFullYear());
         });
 
-        document.getElementById("sendEmailBtn").addEventListener("click", function() {
+        document.getElementById("sendEmailBtnId").addEventListener("click", function () {
 
             swal({
                 title: "Вы уверены?",
@@ -120,7 +120,7 @@
             });
         });
 
-        document.getElementById("paymentsCount").addEventListener("click", function() {
+        document.getElementById("paymentsCountBtnId").addEventListener("click", function () {
             countPayments();
         });
 
@@ -178,7 +178,7 @@
             getDayParts();
             getDuties();
 
-            loader.style.visibility = 'visible';
+            pageLoader.style.visibility = 'visible';
 
             if (userRigstsGroups.length != 0) {
                 configurateSendEmailOrCheckPaimentsButtonsVisibility(group);
@@ -234,7 +234,7 @@
         function tryCeateDutyTable() {
             if (isDataReadyForCreateTable == 3) {
                 createDutyTable();
-                loader.style.visibility = 'hidden';
+                pageLoader.style.visibility = 'hidden';
             }
         }
 
@@ -354,7 +354,7 @@
                 //делаем столбцы одинаковой ширины
                 for (let rowNumber = 0; rowNumber <= dayParts.Responce.length; rowNumber++) {
                     let col = document.createElement('col');
-                    col.style = 'width:' + (100 / (dayParts.Responce.length + 1)).toFixed() + '%';
+                    col.style.cssText = 'width:' + (100 / (dayParts.Responce.length + 1)).toFixed() + '%';
                     table.appendChild(col);
 
                 }
@@ -366,10 +366,19 @@
                     if (rowNumber % 2 != 0) row.classList.add("darkTableLine");
                     for (let colomnNumber = 0; colomnNumber <= dayParts.Responce.length; colomnNumber++) {
                         let cell = row.insertCell(colomnNumber);
+
+                        //добавляю в ячейку атрибуты с ее столбцом и строкой
                         cell.setAttribute("colomnNumber", colomnNumber);
                         cell.setAttribute("rowNumber", rowNumber);
                         cell.colomnNumber = colomnNumber;
                         cell.rowNumber = rowNumber;
+
+                        //подсвечиваем сегоднашний день
+                        if (new Date().getFullYear() == currentYear && new Date().getMonth()+1 == currentMonth && new Date().getDate() == rowNumber) {
+                            cell.className += (cell.className ? " " : "") + "currentDay";
+                        }
+
+                        //в ячейки с дежурствами добавляю селектор дежурных
                         cell.cellSelector = JSON.parse(JSON.stringify(cellSelector));
                         if (rowNumber != 0 & colomnNumber != 0 & userRigstsGroups.includes(currentGroup)) {
                             cell.addEventListener('click', function(event) {
@@ -377,16 +386,18 @@
                             });
                         }
 
+                        //если выходной, то выделяем строку
                         let veekDayNumber = (new Date(currentMonth + "/" + rowNumber + "/" + currentYear)).getDay();
-
                         if (veekDayNumber == 0 || veekDayNumber == 6) {
                             cell.parentElement.classList.add("darkWeekendLine");
                         }
 
+                        //в первую ячейку добавляем селектор месяцев
                         if (colomnNumber == 0 && rowNumber == 0) {
                             createMonthSelector(cell);
                         }
 
+                        //добавляем даты в первый столбец
                         if (colomnNumber == 0 && rowNumber != 0) {
                             cell.innerHTML = AddZeroToNuberLessThen10(rowNumber) + "." + AddZeroToNuberLessThen10(currentMonth) + "." + currentYear +
                                 " " + weelDaysNames[veekDayNumber];
